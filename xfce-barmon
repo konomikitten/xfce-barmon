@@ -1,0 +1,147 @@
+#!/usr/bin/python3
+
+"""
+https://goodies.xfce.org/projects/panel-plugins/xfce4-genmon-plugin
+https://developer.gnome.org/pango/stable/PangoMarkupFormat.html
+"""
+
+import sys
+import psutil as ps
+import pynvml as nv
+import string
+
+labels_colour = "Black"
+values_colour = "Blue"
+units_colour = "#404040"
+
+def main():
+    info = dict();
+    
+    info["cpu"] = dict()
+    info["cpu"]["util"] = round(ps.cpu_percent(interval=0.1))
+
+    sensors_temperatures = ps.sensors_temperatures()
+    for chip in sensors_temperatures:
+        for sensor in sensors_temperatures[chip]:
+            if (sensor.label == "Tdie"):
+                info["cpu"]["temp"] = round(sensor.current)
+                break
+
+    
+    cpu_freq = ps.cpu_freq()
+    info["cpu"]["freq"] = dict()
+    info["cpu"]["freq"]["max"] = round(cpu_freq.max / 1000, 1)
+    info["cpu"]["freq"]["min"] = round(cpu_freq.min / 1000, 1)
+    info["cpu"]["freq"]["cur"] = round(cpu_freq.current / 1000, 1)
+
+    info["cpu"]["freq"]["top"]=0
+    for scpufreq in ps.cpu_freq(percpu=True):
+        if (scpufreq.current > info["cpu"]["freq"]["top"]):
+            cpu_top_core=scpufreq.current
+    info["cpu"]["freq"]["top"] = round(cpu_top_core / 1000, 1)
+
+    try:
+        nv.nvmlInit()
+        handle = nv.nvmlDeviceGetHandleByIndex(0)
+        gpu_util = nv.nvmlDeviceGetUtilizationRates(handle).gpu
+        gpu_temp = nv.nvmlDeviceGetTemperature(
+            handle, nv.NVML_TEMPERATURE_GPU)
+        gpu_freq = nv.nvmlDeviceGetClockInfo(
+            handle, nv.NVML_CLOCK_GRAPHICS)
+        gpu_freq = round(gpu_freq / 1000, 1)
+        gpu_freq_max = nv.nvmlDeviceGetMaxClockInfo(
+            handle, nv.NVML_CLOCK_GRAPHICS)
+        gpu_freq_max = round(gpu_freq_max / 1000, 1)
+        nv.nvmlShutdown()
+    except nv.NVMLError as error:
+        print("<txt>Error: See tooltip</txt><tool>{}</tool>".format(error))
+        sys.exit(1)
+
+    virtual_memory = ps.virtual_memory()
+    memory_used = virtual_memory.used
+    memory_used_gb = round(memory_used / 1024 / 1024 / 1024, 1)
+    memory_total = virtual_memory.total
+    memory_total_gb = round(memory_total / 1024 / 1024 / 1024, 1)
+    memory_used_per = round(memory_used / memory_total * 100)
+    
+    swap_memory = ps.swap_memory()
+    swap_used = swap_memory.used
+    swap_used_gb = round(swap_used / 1024 / 1024 / 1024, 1)
+    swap_total = swap_memory.total
+    swap_total_gb = round(swap_total / 1024 / 1024 / 1024, 1)
+    swap_used_per = round(swap_used / swap_total * 100)
+
+    net_io_counters = ps.net_io_counters(nowrap=True)
+    
+    net_io_sent, net_io_sent_u = bytes_to_binary_prefix(
+        net_io_counters.bytes_sent)
+        
+    net_io_recv, net_io_recv_u = bytes_to_binary_prefix(
+        net_io_counters.bytes_recv)
+
+    print(string.Template(
+    "<txt>"
+        "<span fgcolor='$label_c' weight='Bold'>CPU: </span>"
+            "<span fgcolor='$value_c'>$cpu_util</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> % </span>"
+            "<span fgcolor='$value_c'>$cpu_temp</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> C </span>"
+            "<span fgcolor='$value_c'>$cpu_top_core</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> GHz </span>"
+        "<span fgcolor='$label_c' weight='Bold'>RAM: </span>"
+            "<span fgcolor='$value_c'>$memory_used_per</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> % </span>"
+            "<span fgcolor='$value_c'>$memory_used_gb</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> GB </span>"
+        "<span fgcolor='$label_c' weight='Bold'>NET-I: </span>"
+            "<span fgcolor='$value_c'>$net_io_recv</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> $net_io_recv_u</span>"
+        "\n"            
+        "<span fgcolor='$label_c' weight='Bold'>GPU: </span>"
+            "<span fgcolor='$value_c'>$gpu_util</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> % </span>"
+            "<span fgcolor='$value_c'>$gpu_temp</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> C </span>"
+            "<span fgcolor='$value_c'>$gpu_freq</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> GHz </span>"
+        "<span fgcolor='$label_c' weight='Bold'>SWP: </span>"
+            "<span fgcolor='$value_c'>$swap_used_per</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> % </span>"
+            "<span fgcolor='$value_c'>$swap_used_gb</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> GB </span>"
+        "<span fgcolor='$label_c' weight='Bold'>NET-O: </span>"
+            "<span fgcolor='$value_c'>$net_io_sent</span>"
+            "<span fgcolor='$units_c' rise='1000' size='small'> $net_io_sent_u</span>"
+    "</txt>"
+    "<tool>xfce-barmon</tool>").substitute(
+        label_c = labels_colour,
+        value_c = values_colour,
+        units_c = units_colour, 
+        cpu_util = str(info["cpu"]["util"]).rjust(3), 
+        cpu_temp = str(info["cpu"]["temp"]).rjust(3),
+        cpu_top_core = str(info["cpu"]["freq"]["top"]).rjust(3), 
+        memory_used_per = str(memory_used_per).rjust(3),
+        memory_used_gb = str(memory_used_gb).rjust(4),
+        gpu_util = str(gpu_util).rjust(3),
+        gpu_temp = str(gpu_temp).rjust(3),
+        gpu_freq = str(gpu_freq).rjust(3),
+        swap_used_per = str(swap_used_per).rjust(3),
+        swap_used_gb = str(swap_used_gb).rjust(4),
+        net_io_recv = str(net_io_recv).rjust(6),
+        net_io_recv_u = str(net_io_recv_u).rjust(3),
+        net_io_sent = str(net_io_sent).rjust(6),
+        net_io_sent_u = str(net_io_sent_u).rjust(3))
+    )
+
+def bytes_to_binary_prefix(bytes):
+    prefix_index = 0
+    prefix = ("B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB")
+
+    while(bytes >= 1024 and prefix_index < (len(prefix) - 1)):
+        bytes = bytes / 1024
+        prefix_index = prefix_index + 1
+
+    return(round(bytes, 1), prefix[prefix_index])
+
+if __name__ == '__main__':
+    main()
