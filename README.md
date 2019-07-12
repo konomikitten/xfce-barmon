@@ -11,5 +11,6 @@ A system information display that uses [xfce genmon](https://goodies.xfce.org/pr
 ## ScreenShots
 
 ![xfce-barmon](/screenshots/xfce-barmon.png?raw=true)
+
 ![Configuration](/screenshots/configuration.png?raw=true)
 
