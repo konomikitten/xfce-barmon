@@ -2,7 +2,7 @@
 
 ## Description
 
-A system information display that uses [xfce genmon](https://goodies.xfce.org/projects/panel-plugins/xfce4-genmon-plugin).
+A system information display for Xfce panel.
 
 ## Dependancies
 
