@@ -65,11 +65,18 @@ def main():
     memory_used_per = round(memory_used / memory_total * 100)
     
     swap_memory = ps.swap_memory()
-    swap_used = swap_memory.used
-    swap_used_gb = round(swap_used / 1024 / 1024 / 1024, 1)
-    swap_total = swap_memory.total
-    swap_total_gb = round(swap_total / 1024 / 1024 / 1024, 1)
-    swap_used_per = round(swap_used / swap_total * 100)
+    swap_used = 0
+    swap_used_gb = 0
+    swap_total = 0
+    swap_total_gb = 0
+    swap_used_per = 0
+    if (swap_memory.total != 0):
+        swap_used = swap_memory.used
+        swap_used_gb = round(swap_used / 1024 / 1024 / 1024, 1)
+        swap_total = swap_memory.total
+        swap_total_gb = round(swap_total / 1024 / 1024 / 1024, 1)
+        swap_used_per = round(swap_used / swap_total * 100)
+    
 
     net_io_counters = ps.net_io_counters(nowrap=True)
     
