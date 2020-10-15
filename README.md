@@ -8,8 +8,10 @@ A system information display for Xfce panel.
 
 When you first launch xfce-barmon via genmon it will complain that 
 `xfce-barmon.template` is missing, this is normal. Either create your own 
-template or smylink one the existing templates provided. The templates use 
-[Pango Markup](https://developer.gnome.org/pango/stable/pango-Markup.html).
+template or smylink one the existing templates provided. The templates uses 
+[Pango Markup](https://developer.gnome.org/pango/stable/pango-Markup.html). 
+Note that new lines and white space are removed the double line template 
+shows how to add new lines.
 
 ## Dependancies
 
