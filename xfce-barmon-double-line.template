@@ -1,0 +1,37 @@
+<txt>
+    <span fgcolor="Black" weight="Bold">CPU:</span>
+        <span fgcolor="Blue">${cpu_usage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+        <span fgcolor="Blue">${cpu_temperature} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">C </span>
+        <span fgcolor="Blue">${cpu_frequency_current} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">GHz </span>
+    <span fgcolor="Black" weight="Bold">RAM:</span>
+        <span fgcolor="Blue">${memory_used_percentage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+        <span fgcolor="Blue">${memory_used_size} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">${memory_used_size_suffix} </span>
+    <span fgcolor="Black" weight="Bold">NET-I:</span>
+        <span fgcolor="Blue">${net_received_size} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">${net_received_size_suffix}</span>
+
+    ${new_line}
+
+    <span fgcolor="Black" weight="Bold">GPU:</span>
+        <span fgcolor="Blue">${gpu_usage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+        <span fgcolor="Blue">${gpu_temperature} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">C </span>
+        <span fgcolor="Blue">${gpu_frequency_current} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">GHz </span>
+    <span fgcolor="Black" weight="Bold">SWP:</span>
+        <span fgcolor="Blue">${swap_used_percentage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+        <span fgcolor="Blue">${swap_used_size} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">${swap_used_size_suffix} </span>
+    <span fgcolor="Black" weight="Bold">NET-O:</span>
+        <span fgcolor="Blue">${net_sent_size} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">${net_sent_size_suffix}</span>
+</txt>
+
+<tool>${tooltip}</tool>

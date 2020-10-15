@@ -1,0 +1,16 @@
+<txt>
+    <span fgcolor="Black" weight="Bold">CPU:</span>
+        <span fgcolor="Blue">${cpu_usage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+    <span fgcolor="Black" weight="Bold">GPU:</span>
+        <span fgcolor="Blue">${gpu_usage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+    <span fgcolor="Black" weight="Bold">RAM:</span>
+        <span fgcolor="Blue">${memory_used_percentage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+    <span fgcolor="Black" weight="Bold">SWP:</span>
+        <span fgcolor="Blue">${swap_used_percentage} </span>
+        <span fgcolor="DimGray" rise="1000" size="small">% </span>
+</txt>
+
+<tool>${tooltip}</tool>
