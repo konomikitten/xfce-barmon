@@ -10,8 +10,9 @@ When you first launch xfce-barmon via genmon it will complain that
 `xfce-barmon.template` is missing, this is normal. Either create your own 
 template or smylink one the existing templates provided. The templates uses 
 [Pango Markup](https://developer.gnome.org/pango/stable/pango-Markup.html). 
-Note that new lines and white space are removed the double line template 
-shows how to add new lines.
+Whitespace at the start and end of all lines is removed and then the new 
+lines themselves are removed when reading the template. You can use 
+`${new_line}` as a place holder for where you want new lines to appear.
 
 ## Dependancies
 
