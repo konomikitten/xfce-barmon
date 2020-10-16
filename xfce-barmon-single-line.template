@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <txt>
     <span fgcolor="Black" weight="Bold">CPU:</span>
         <span fgcolor="Blue">${cpu_usage} </span>
