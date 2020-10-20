@@ -15,29 +15,29 @@ lines themselves are removed when reading the template. You can use
 `${new_line}` as a place holder for where you want new lines to appear.
 
 ## Template Variables
- * ${new_line}
- * ${tooltip}
- * ${cpu_usage}
- * ${cpu_temperature}
- * ${cpu_frequency_current}
- * ${memory_used_percentage}
- * ${memory_used_size}
- * ${memory_used_size_suffix}
- * ${gpu_usage}
- * ${gpu_fan_speed}
- * ${gpu_temperature}
- * ${gpu_memory_used_percentage}
- * ${gpu_memory_used_size}
- * ${gpu_memory_used_size_suffix}
- * ${gpu_memory_total_size}
- * ${gpu_memory_total_size_suffix}
- * ${swap_used_percentage}
- * ${swap_used_size}
- * ${swap_used_size_suffix}
- * ${net_received_size}
- * ${net_received_size_suffix}
- * ${net_sent_size}
- * ${net_sent_size_suffix}
+ * `${new_line}`
+ * `${tooltip}`
+ * `${cpu_usage}`
+ * `${cpu_temperature}`
+ * `${cpu_frequency_current}`
+ * `${memory_used_percentage}`
+ * `${memory_used_size}`
+ * `${memory_used_size_suffix}`
+ * `${gpu_usage}`
+ * `${gpu_fan_speed}`
+ * `${gpu_temperature}`
+ * `${gpu_memory_used_percentage}`
+ * `${gpu_memory_used_size}`
+ * `${gpu_memory_used_size_suffix}`
+ * `${gpu_memory_total_size}`
+ * `${gpu_memory_total_size_suffix}`
+ * `${swap_used_percentage}`
+ * `${swap_used_size}`
+ * `${swap_used_size_suffix}`
+ * `${net_received_size}`
+ * `${net_received_size_suffix}`
+ * `${net_sent_size}`
+ * `${net_sent_size_suffix}`
 
 ## Dependancies
 
