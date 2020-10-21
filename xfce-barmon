@@ -16,7 +16,7 @@ def main():
     memory_used_percentage = "?"
     memory_used_size = "?"
     memory_used_size_suffix = "?"
-    
+
     gpu_usage = "?"
     gpu_fan_speed = "?"
     gpu_temperature = "?"
@@ -26,11 +26,11 @@ def main():
     gpu_memory_used_size_suffix = "?"
     gpu_memory_total_size = "?"
     gpu_memory_total_size_suffix = "?"
-    
+
     swap_used_percentage = "?"
     swap_used_size = "?"
     swap_used_size_suffix = "?"
-    
+
     net_received_size = "?"
     net_received_size_suffix = "?"
     net_sent_size = "?"
@@ -39,96 +39,99 @@ def main():
 
     # CPU
     cpu_usage = round(ps.cpu_percent(interval=0.1))
-    
+
     sensors_fans = ps.sensors_fans()
-    
+
     sensors_temperatures = ps.sensors_temperatures()
     for chip in sensors_temperatures:
         for sensor in sensors_temperatures[chip]:
             if (sensor.label == "Tdie"):
                 cpu_temperature = round(sensor.current)
                 break
-    
+
     cpu_freq = ps.cpu_freq()
     cpu_frequency_current = round(cpu_freq.current / 1000, 1)
-    
-    
+
+
     # GPU
-    try:
-        import pynvml as nv
-        nv.nvmlInit()
-        handle = nv.nvmlDeviceGetHandleByIndex(0)
-        gpu_usage = nv.nvmlDeviceGetUtilizationRates(handle).gpu
-        gpu_temperature = nv.nvmlDeviceGetTemperature(handle,
-            nv.NVML_TEMPERATURE_GPU)
-        gpu_fan_speed = nv.nvmlDeviceGetFanSpeed(handle)
-        gpu_frequency_current = round(nv.nvmlDeviceGetClockInfo(handle,
-            nv.NVML_CLOCK_GRAPHICS) / 1000, 1)
-        gpu_frequency_maximum = round(
-            nv.nvmlDeviceGetMaxClockInfo(handle,
-            nv.NVML_CLOCK_GRAPHICS) / 1000, 1)
-        gpu_memory_used_percentage = nv.nvmlDeviceGetMemoryInfo(
-            handle).used
-        gpu_memory_total_size = nv.nvmlDeviceGetMemoryInfo(
-            handle).total
-        gpu_memory_used_percentage = round(gpu_memory_used_size /
-            gpu_memory_total_size * 100)
+    if os.path.isdir("/sys/module/nvidia"):
+        try:
+            import pynvml as nv
+            nv.nvmlInit()
+            handle = nv.nvmlDeviceGetHandleByIndex(0)
+            gpu_usage = nv.nvmlDeviceGetUtilizationRates(handle).gpu
+            gpu_temperature = nv.nvmlDeviceGetTemperature(handle,
+                nv.NVML_TEMPERATURE_GPU)
+            gpu_fan_speed = nv.nvmlDeviceGetFanSpeed(handle)
+            gpu_frequency_current = round(nv.nvmlDeviceGetClockInfo(handle,
+                nv.NVML_CLOCK_GRAPHICS) / 1000, 1)
+            gpu_frequency_maximum = round(
+                nv.nvmlDeviceGetMaxClockInfo(handle,
+                nv.NVML_CLOCK_GRAPHICS) / 1000, 1)
+            gpu_memory_used_size = nv.nvmlDeviceGetMemoryInfo(
+                handle).used
+            gpu_memory_total_size = nv.nvmlDeviceGetMemoryInfo(
+                handle).total
+            gpu_memory_used_percentage = round(
+                gpu_memory_used_size / gpu_memory_total_size * 100)
 
-        gpu_memory_used_size, 
-        gpu_memory_used_size_suffix = bytes_to_binary_prefix(
-            gpu_memory_used_size)
-        
-        gpu_memory_total_size, 
-        gpu_memory_total_size_suffix = bytes_to_binary_prefix(
-            gpu_memory_total_size)
-        nv.nvmlShutdown()
-    except Exception as error:
-        tooltip = error
-    
-    try:
-        with open("/sys/class/drm/card0/device/gpu_busy_percent",
-        "r") as file_handle:
-            gpu_usage = round(file_handle.read())
+            gpu_memory_used_size,
+            gpu_memory_used_size_suffix = bytes_to_binary_prefix(
+                gpu_memory_used_size)
 
-        gpu_temperature = round(sensors_temperatures["amdgpu"][0].current)
-        
-        gpu_fan_speed = round(sensors_fans["amdgpu"][0].current)
-        
-        with open("/sys/class/drm/card0/device/pp_dpm_sclk",
-        "r") as file_handle:
-            for line in file_handle.read().splitlines():
-                if not (line.endswith("*")): continue
-                gpu_frequency_current = round(line.split()[1][:-3] / 1000, 1)
-        
-        with open("/sys/class/drm/card0/device/mem_info_vram_used",
-        "r") as file_handle:
-            gpu_memory_used_size = file_handle.read()
-        
-        with open("/sys/class/drm/card0/device/mem_info_vram_total",
-        "r") as file_handle:
-            gpu_memory_total_size = file_handle.read()
-        
-        gpu_memory_used_percentage = round(gpu_memory_used_size /
-            gpu_memory_total_size * 100)
-        
-        gpu_memory_used_size, 
-        gpu_memory_used_size_suffix = bytes_to_binary_prefix(
-            gpu_memory_used_size)
+            gpu_memory_total_size,
+            gpu_memory_total_size_suffix = bytes_to_binary_prefix(
+                gpu_memory_total_size)
+            nv.nvmlShutdown()
+        except Exception as error:
+            tooltip = error
 
-        gpu_memory_total_size, 
-        gpu_memory_total_size_suffix = bytes_to_binary_prefix(
-            gpu_memory_total_size)
-    except Exception as error:
-        tooltip = error
-                    
-    
+    if os.path.isdir("/sys/module/amdgpu"):
+        try:
+            with open("/sys/class/drm/card0/device/gpu_busy_percent",
+            "r") as file_handle:
+                gpu_usage = round(file_handle.read())
+
+            gpu_temperature = round(sensors_temperatures["amdgpu"][0].current)
+
+            gpu_fan_speed = round(sensors_fans["amdgpu"][0].current)
+
+            with open("/sys/class/drm/card0/device/pp_dpm_sclk",
+            "r") as file_handle:
+                for line in file_handle.read().splitlines():
+                    if not (line.endswith("*")): continue
+                    gpu_frequency_current = round(
+                        line.split()[1][:-3] / 1000, 1)
+
+            with open("/sys/class/drm/card0/device/mem_info_vram_used",
+            "r") as file_handle:
+                gpu_memory_used_size = file_handle.read()
+
+            with open("/sys/class/drm/card0/device/mem_info_vram_total",
+            "r") as file_handle:
+                gpu_memory_total_size = file_handle.read()
+
+            gpu_memory_used_percentage = round(gpu_memory_used_size /
+                gpu_memory_total_size * 100)
+
+            gpu_memory_used_size, 
+            gpu_memory_used_size_suffix = bytes_to_binary_prefix(
+                gpu_memory_used_size)
+
+            gpu_memory_total_size, 
+            gpu_memory_total_size_suffix = bytes_to_binary_prefix(
+                gpu_memory_total_size)
+        except Exception as error:
+            tooltip = error
+
+
     # Memory
     virtual_memory = ps.virtual_memory()
     memory_used_percentage = round(virtual_memory.used /
         virtual_memory.total * 100)
     memory_used_size, memory_used_size_suffix = bytes_to_binary_prefix(
         virtual_memory.total - virtual_memory.used)
-    
+
     # Swap
     swap_memory = ps.swap_memory()
     if (swap_memory.total != 0):
@@ -136,15 +139,15 @@ def main():
             swap_memory.total * 100)
         swap_used_size, swap_used_size_suffix = bytes_to_binary_prefix(
             swap_memory.total - swap_memory.used)
-    
-    
+
+
     # Network
     net_io_counters = ps.net_io_counters(nowrap=True)
     net_received_size, net_received_size_suffix = bytes_to_binary_prefix(
         net_io_counters.bytes_recv)
     net_sent_size, net_sent_size_suffix = bytes_to_binary_prefix(
         net_io_counters.bytes_sent)
-    
+
 
     # Template
     template_filepath = os.path.join(os.path.dirname(
@@ -165,11 +168,11 @@ def main():
         cpu_usage = str(cpu_usage).rjust(3),
         cpu_temperature = str(cpu_temperature).rjust(3),
         cpu_frequency_current = str(cpu_frequency_current).rjust(3),
-        
+
         memory_used_percentage = str(memory_used_percentage).rjust(3),
         memory_used_size = str(memory_used_size).rjust(3),
         memory_used_size_suffix = str(memory_used_size_suffix).rjust(3),
-        
+
         gpu_usage = str(gpu_usage).rjust(3),
         gpu_fan_speed = str(gpu_fan_speed).rjust(4),
         gpu_temperature = str(gpu_temperature).rjust(3),
@@ -182,11 +185,11 @@ def main():
         gpu_memory_total_size = str(gpu_memory_total_size).rjust(4),
         gpu_memory_total_size_suffix = str(gpu_memory_total_size_suffix).
             rjust(3),
-        
+
         swap_used_percentage = str(swap_used_percentage).rjust(3),
         swap_used_size = str(swap_used_size).rjust(3),
         swap_used_size_suffix = str(swap_used_size_suffix).rjust(3),
-        
+
         net_received_size = str(net_received_size).rjust(4),
         net_received_size_suffix = str(net_received_size_suffix).rjust(3),
         net_sent_size = str(net_sent_size).rjust(4),
