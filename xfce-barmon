@@ -88,16 +88,16 @@ def main():
 
     if os.path.isdir("/sys/module/amdgpu"):
         try:
-            with open("/sys/class/drm/card0/device/gpu_busy_percent",
-            "r") as file_handle:
+            with open("""/sys/class/drm/
+            card0/device/gpu_busy_percent""", "r") as file_handle:
                 gpu_usage = round(file_handle.read())
 
             gpu_temperature = round(sensors_temperatures["amdgpu"][0].current)
 
             gpu_fan_speed = round(sensors_fans["amdgpu"][0].current)
 
-            with open("/sys/class/drm/card0/device/pp_dpm_sclk",
-            "r") as file_handle:
+            with open("""/sys/class/drm/card0/
+            device/pp_dpm_sclk""", "r") as file_handle:
                 for line in file_handle.read().splitlines():
                     if not (line.endswith("*")): continue
                     gpu_frequency_current = round(
@@ -130,7 +130,7 @@ def main():
     memory_used_percentage = round(virtual_memory.used /
         virtual_memory.total * 100)
     memory_used_size, memory_used_size_suffix = bytes_to_binary_prefix(
-        virtual_memory.total - virtual_memory.used)
+        virtual_memory.used)
 
     # Swap
     swap_memory = ps.swap_memory()
@@ -138,7 +138,7 @@ def main():
         swap_used_percentage = round(swap_memory.used /
             swap_memory.total * 100)
         swap_used_size, swap_used_size_suffix = bytes_to_binary_prefix(
-            swap_memory.total - swap_memory.used)
+            swap_memory.used)
 
 
     # Network
